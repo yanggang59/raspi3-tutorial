@@ -22,7 +22,8 @@
 # DEALINGS IN THE SOFTWARE.
 #
 #
-
+CROSS ?= aarch64-linux-gnu
+QEMU_BASE_DIR ?= /home/thomas/workspace/qemu-8.2.1/install/bin/
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
 CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
@@ -30,17 +31,21 @@ CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
 all: clean kernel8.img
 
 start.o: start.S
-	aarch64-elf-gcc $(CFLAGS) -c start.S -o start.o
+	${CROSS}-gcc $(CFLAGS) -c start.S -o start.o
 
 %.o: %.c
-	aarch64-elf-gcc $(CFLAGS) -c $< -o $@
+	${CROSS}-gcc $(CFLAGS) -c $< -o $@
 
 kernel8.img: start.o $(OBJS)
-	aarch64-elf-ld -nostdlib -nostartfiles start.o $(OBJS) -T link.ld -o kernel8.elf
-	aarch64-elf-objcopy -O binary kernel8.elf kernel8.img
+	${CROSS}-ld -nostdlib -nostartfiles start.o $(OBJS) -T link.ld -o kernel8.elf
+	${CROSS}-objcopy -O binary kernel8.elf kernel8.img
 
 clean:
 	rm kernel8.elf *.o >/dev/null 2>/dev/null || true
+	rm test.dd -f
 
-run:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -drive file=test.dd,if=sd,format=raw -serial stdio
+test.dd:
+	dd if=/dev/zero of=$@ bs=1M count=16
+
+run:test.dd
+	${QEMU_BASE_DIR}/qemu-system-aarch64 -M raspi3b -kernel kernel8.img -drive file=test.dd,if=sd,format=raw -serial stdio
