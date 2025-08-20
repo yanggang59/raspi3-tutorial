@@ -44,4 +44,4 @@ clean:
 	rm kernel8.elf *.o >/dev/null 2>/dev/null || true
 
 run:
-	${QEMU_BASE_DIR}/qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio
+	${QEMU_BASE_DIR}/qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio -display none 

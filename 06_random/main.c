@@ -32,6 +32,7 @@ void main()
     uart_init();
     rand_init();
     
+    uart_puts("Hello World !!!\r\n");
     uart_puts("Here goes a random number: ");
     uart_hex(rand(0,4294967295));
     uart_puts("\n");

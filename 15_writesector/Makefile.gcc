@@ -44,8 +44,12 @@ clean:
 	rm kernel8.elf *.o >/dev/null 2>/dev/null || true
 	rm -f test.dd
 
-test.dd:
+test.dd: kernel8.img
 	dd if=/dev/zero of=./test.dd bs=1M count=16
 
 run:test.dd
-	${QEMU_BASE_DIR}/qemu-system-aarch64 -M raspi3b -kernel kernel8.img -drive file=test.dd,if=sd,format=raw -serial stdio
+	${QEMU_BASE_DIR}/qemu-system-aarch64 -M raspi3b \
+		-kernel kernel8.img \
+		-drive file=test.dd,if=sd,format=raw \
+		-serial stdio \
+		-display none 
